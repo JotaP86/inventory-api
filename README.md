@@ -1,5 +1,7 @@
 # Inventory API
 
+[![CI](https://github.com/JotaP86/inventory-api/actions/workflows/ci.yml/badge.svg)](https://github.com/JotaP86/inventory-api/actions)
+
 API REST para gestionar el stock de un almacén: catálogo de productos, entradas y salidas de mercancía, ajustes por recuento de inventario e historial de movimientos.
 
 Está escrita en Java 21 con JDBC y H2, sin frameworks. El servidor HTTP es el que incluye el propio JDK.
@@ -111,13 +113,25 @@ curl -X POST http://localhost:8080/api/products/1/movements \
   -d '{"type":"EXIT","quantity":18,"reason":"Pedido 1042"}'
 ```
 
-Intentar sacar más unidades de las que hay:
+Intentar sacar más unidades de las que hay (con los datos de ejemplo, el producto 6 tiene 18 unidades):
+
+```bash
+curl -X POST http://localhost:8080/api/products/6/movements \
+  -H "Content-Type: application/json" \
+  -d '{"type":"EXIT","quantity":500}'
+```
 
 ```json
 {"status":409,"error":"Conflict","message":"Insufficient stock for CHAL-HV: available 18, requested 500"}
 ```
 
 Datos inválidos:
+
+```bash
+curl -X POST http://localhost:8080/api/products \
+  -H "Content-Type: application/json" \
+  -d '{"price":-1}'
+```
 
 ```json
 {"status":400,"error":"Bad Request","message":"Validation failed","details":["sku is required","name is required","price must not be negative"]}
@@ -145,7 +159,7 @@ Hay 36 tests:
 - Concurrencia: salidas simultáneas que no pueden superar el stock disponible.
 - Integración: se arranca el servidor real y se prueban los endpoints por HTTP, incluidos los casos de error.
 
-El workflow de GitHub Actions en `.github/workflows/ci.yml` compila y ejecuta los tests en cada push.
+El workflow de GitHub Actions en `.github/workflows/ci.yml` compila y ejecuta los tests en cada push a `main` y en cada pull request.
 
 ## Limitaciones y siguientes pasos
 
@@ -154,3 +168,7 @@ El workflow de GitHub Actions en `.github/workflows/ci.yml` compila y ejecuta lo
 - El esquema se crea con un script al arrancar. Para evolucionarlo con seguridad convendría usar migraciones (Flyway).
 - H2 es suficiente para desarrollo; en producción se usaría PostgreSQL o similar.
 - Migrar a Spring Boot y documentar la API con OpenAPI.
+
+## Licencia
+
+Distribuido bajo la licencia MIT; consulta el archivo [LICENSE](LICENSE).
