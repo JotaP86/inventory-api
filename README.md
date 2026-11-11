@@ -20,7 +20,7 @@ Está escrita en Java 21 con JDBC y H2, sin frameworks. El servidor HTTP es el q
 - Maven
 - H2 (base de datos SQL embebida)
 - Jackson (JSON)
-- JUnit 5
+- JUnit 6
 
 ## Estructura
 
